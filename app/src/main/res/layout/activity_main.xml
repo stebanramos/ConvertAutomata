@@ -9,8 +9,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingTop="50dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -108,18 +109,21 @@
             android:layout_height="wrap_content">
 
             <Button
+                android:id="@+id/btnConvert"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
                 android:layout_weight="1"
                 android:text="Convertir"
-                android:layout_marginEnd="5dp"/>
+                android:visibility="gone"/>
 
             <Button
                 android:id="@+id/btnNuevo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Nuevo"/>
+                android:text="Nuevo"
+                android:visibility="gone"/>
 
         </LinearLayout>
 

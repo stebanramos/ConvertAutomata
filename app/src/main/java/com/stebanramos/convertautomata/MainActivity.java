@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -14,17 +15,25 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class MainActivity extends AppCompatActivity {
 
-    TableLayout tableLayout;
-    String[] colores = {"A", "B", "C", "D", "F", "G", "h", "I", "J", "K"};
-    String[] tallas = {"BLANCO", "VERDE", "PÚRPURA", "AMARILLO", "MARRÓN"};
+    private TableLayout tLayoutAFND, tLayoutAFD;
+    private String[] estados = {"A", "B", "C", "D", "F", "G", "h", "I", "J", "K"};
+    private List<String> estadosAFD;
+    private Map<String, Map<Integer, String>> afndMap;
 
     //Con ese atributo decimos que la anchura de la fila será con el atributo WRAP_CONTENT
-    TableRow.LayoutParams lp;
-    TableRow tRowFND, tRowFD;
+    private TableRow.LayoutParams lp;
+    private TableRow tRowFND, tRowFD;
+    private LinearLayout layoutInitData, layoutAFND, layoutAFD;
 
-    LinearLayout layoutInitData, layoutAFND, layoutAFD;
+    private int nEntradas;
+    private String[] sEntradas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,36 +43,33 @@ public class MainActivity extends AppCompatActivity {
         EditText etEstados = findViewById(R.id.etEstados);
         EditText etEntradas = findViewById(R.id.etEntradas);
 
-        tableLayout = findViewById(R.id.tableAFND);
+        tLayoutAFND = findViewById(R.id.tableAFND);
+        tLayoutAFD = findViewById(R.id.tableAFD);
         layoutInitData = findViewById(R.id.datosIniciales);
         layoutAFND = findViewById(R.id.layoutAFND);
         layoutAFD = findViewById(R.id.layoutAFD);
 
-
-        tRowFD = new TableRow(this);
-        lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
-
-        tRowFD.setLayoutParams(lp);
-
-        // Borde
-
-        tRowFD.setBackgroundResource(R.drawable.border_table);
-
+        Button btnConvert = findViewById(R.id.btnConvert);
+        Button btnNuevo = findViewById(R.id.btnNuevo);
         Button btnContinuar = findViewById(R.id.btncontinuar);
+
+        lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
 
         btnContinuar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 int estados = Integer.parseInt(etEstados.getText().toString());
-                int entradas = Integer.parseInt(etEntradas.getText().toString());
+                nEntradas = Integer.parseInt(etEntradas.getText().toString());
 
                 layoutInitData.setVisibility(View.GONE);
                 layoutAFND.setVisibility(View.VISIBLE);
-                initTableAFND(estados, entradas);
+
+                btnConvert.setVisibility(View.VISIBLE);
+                btnNuevo.setVisibility(View.VISIBLE);
+
+                initTableAFND(estados);
             }
         });
-
-        Button btnNuevo = findViewById(R.id.btnNuevo);
 
         btnNuevo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,12 +77,26 @@ public class MainActivity extends AppCompatActivity {
 
                 layoutInitData.setVisibility(View.VISIBLE);
                 layoutAFND.setVisibility(View.GONE);
+                layoutAFD.setVisibility(View.GONE);
+                btnConvert.setVisibility(View.GONE);
+                btnNuevo.setVisibility(View.GONE);
+
+                tLayoutAFD.removeAllViews();
+                tLayoutAFND.removeAllViews();
+            }
+        });
+
+        btnConvert.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                layoutAFD.setVisibility(View.VISIBLE);
+                convert();
             }
         });
 
     }
 
-    private void initTableAFND(int estados, int entradas){
+    private void initTableAFND(int nEstados) {
 
         tRowFND = new TableRow(this);
         tRowFND.setLayoutParams(lp);
@@ -89,40 +109,183 @@ public class MainActivity extends AppCompatActivity {
         tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         tRowFND.addView(tv);
 
-        // Ahora agregar las tallas
-        for (int x = 0; x < entradas; x++) {
+        // Ahora agregar las entradas
+        for (int x = 0; x < nEntradas; x++) {
             EditText editText = new EditText(this);
             editText.setInputType(InputType.TYPE_CLASS_NUMBER);
-            editText.setHint("Entrada " + (x+1));
+            editText.setHint("Entrada " + (x + 1));
             editText.setWidth(10);
             editText.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             tRowFND.addView(editText);
         }
         // Finalmente agregar la fila en la primera posición
-        tableLayout.addView(tRowFND, 0);
+        tLayoutAFND.addView(tRowFND, 0);
         // Ahora por cada color hacer casi lo mismo
-        for (int x = 0; x < estados; x++) {
-            TableRow filaColor = new TableRow(this);
-            filaColor.setLayoutParams(lp);
+        for (int x = 0; x < nEstados; x++) {
+            TableRow filaEstado = new TableRow(this);
+            filaEstado.setLayoutParams(lp);
             // Borde
-            filaColor.setBackgroundResource(R.drawable.border_table);
-            // El nombre del color
-            TextView textViewColor = new TextView(this);
-            textViewColor.setText(colores[x]);
-            textViewColor.setTypeface(null, Typeface.BOLD);
-            textViewColor.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-            filaColor.addView(textViewColor);
-            // Y ahora por cada talla, agregar un campo de texto
-            for (int y = 0; y < entradas; y++) {
+            filaEstado.setBackgroundResource(R.drawable.border_table);
+            // El nombre del estado
+            TextView textViewestado = new TextView(this);
+            textViewestado.setText(estados[x]);
+            textViewestado.setTypeface(null, Typeface.BOLD);
+            textViewestado.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            filaEstado.addView(textViewestado);
+            // Y ahora por cada estado, agregar un campo de texto
+            for (int y = 0; y < nEntradas; y++) {
                 EditText editText = new EditText(this);
-                editText.setInputType(InputType.TYPE_CLASS_TEXT| InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+                editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
                 editText.setWidth(10);
                 editText.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-                filaColor.addView(editText);
-                filaColor.setMinimumWidth(10);
+                filaEstado.addView(editText);
+                filaEstado.setMinimumWidth(10);
             }
             // Finalmente agregar la fila
-            tableLayout.addView(filaColor);
+            tLayoutAFND.addView(filaEstado);
+
+        }
+    }
+
+    private void getDataAFND() {
+        estadosAFD = new ArrayList<>();
+        estadosAFD.add(estados[0]);
+        afndMap = new HashMap<>();
+        sEntradas = new String[nEntradas];
+
+        View row = tLayoutAFND.getChildAt(0);
+        if (row instanceof TableRow) {
+            TableRow rowC = (TableRow) row;
+
+            for (int j = 1; j < rowC.getChildCount(); j++) {
+                TextView texto = (TextView) rowC.getChildAt(j);
+                String edttext = texto.getText().toString();
+                Log.i("Entrada:", edttext);
+
+                sEntradas[j - 1] = edttext;
+            }
+        }
+
+
+        for (int i = 1; i < tLayoutAFND.getChildCount(); i++) {
+            row = tLayoutAFND.getChildAt(i);
+            if (row instanceof TableRow) {
+                TableRow rowC = (TableRow) row;
+                Log.i("Estado:", estados[i - 1]);
+                Map<Integer, String> entries = new HashMap<>();
+
+                for (int j = 1; j < rowC.getChildCount(); j++) {
+                    TextView texto = (TextView) rowC.getChildAt(j);
+                    String edttext = texto.getText().toString();
+                    Log.i("Informacion:", edttext);
+
+                    entries.put(j, edttext);
+
+                    afndMap.put(estados[i - 1], entries);
+
+                    boolean isEstado = estadosAFD.contains(edttext);
+                    if (!isEstado) {
+                        estadosAFD.add(edttext);
+                    }
+                }
+            }
+        }
+        Log.i("estadosAFD:", estadosAFD.toString());
+        Log.i("Numero estadosAFD:", String.valueOf(estadosAFD.size()));
+
+        Log.i("Map:", String.valueOf(afndMap));
+
+    }
+
+    private void convert() {
+        tLayoutAFD.removeAllViews();
+
+        getDataAFND();
+
+        tRowFD = new TableRow(this);
+        tRowFD.setLayoutParams(lp);
+        // Borde
+        tRowFD.setBackgroundResource(R.drawable.border_table);
+
+        //El elemento de la izquierda
+        TextView tv = new TextView(this);
+        tv.setTypeface(null, Typeface.BOLD);
+        tv.setText("Estados/Entradas");
+        tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        tRowFD.addView(tv);
+
+        // Ahora agregar las entradas
+        for (int x = 0; x < nEntradas; x++) {
+            TextView textViewEntradas = new TextView(this);
+            textViewEntradas.setText(sEntradas[x]);
+            textViewEntradas.setTypeface(null, Typeface.BOLD);
+            textViewEntradas.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            tRowFD.addView(textViewEntradas);
+        }
+        // Finalmente agregar la fila en la primera posición
+        tLayoutAFD.addView(tRowFD, 0);
+        // Ahora por cada color hacer casi lo mismo
+        for (int x = 0; x < estadosAFD.toArray().length; x++) {
+            TableRow filaEstado = new TableRow(this);
+            filaEstado.setLayoutParams(lp);
+            // Borde
+            filaEstado.setBackgroundResource(R.drawable.border_table);
+            // El nombre del estado
+            TextView textViewestado = new TextView(this);
+
+            String estadoAFD = estadosAFD.get(x);
+
+            if(estadoAFD.equals("")){
+                estadoAFD = "Error";
+            }
+
+            textViewestado.setText(estadoAFD);
+            textViewestado.setTypeface(null, Typeface.BOLD);
+            textViewestado.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            filaEstado.addView(textViewestado);
+            // Y ahora por cada estado, agregar un campo de texto
+
+            for (int y = 0; y < nEntradas; y++) {
+
+                String estado = estadosAFD.get(x);
+                Log.i("Estado :", estado);
+
+                String entrada = "";
+                Map<Integer, String> entries;
+                if (estado.length() >= 2) {
+                    for (int j = 0; j < estado.length(); j++) {
+                        char c = estado.charAt(j);
+                        entries = afndMap.get(String.valueOf(c));
+                        Log.i("Map entries :", String.valueOf(entries));
+
+                        entrada += entries.get(y + 1);
+
+                    }
+                } else {
+                    if (estado.equals("")){
+                        entrada = "Error";
+                    }else{
+
+                        entries = afndMap.get(estado);
+                        Log.i("Map entries :", String.valueOf(entries));
+                        entrada = entries.get(y + 1);
+
+                        if (entrada.equals("")){
+                            entrada = "Error";
+                        }
+                    }
+
+                }
+
+                TextView textViewEntradas = new TextView(this);
+                textViewEntradas.setText(entrada);
+                textViewEntradas.setTypeface(null, Typeface.BOLD);
+                textViewEntradas.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                filaEstado.addView(textViewEntradas);
+                filaEstado.setMinimumWidth(10);
+            }
+            // Finalmente agregar la fila
+            tLayoutAFD.addView(filaEstado);
 
         }
     }
