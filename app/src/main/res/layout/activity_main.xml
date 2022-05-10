@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Convertir AFND a AFD"
+            android:layout_marginBottom="30dp"/>
+
+        <LinearLayout
+            android:id="@+id/datosIniciales"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <EditText
+                android:id="@+id/etEstados"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Número de estados"
+                android:inputType="number"
+                android:textAlignment="center"/>
+
+            <EditText
+                android:id="@+id/etEntradas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Número de entradas"
+                android:inputType="number"
+                android:textAlignment="center"/>
+
+            <Button
+                android:id="@+id/btncontinuar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Continuar"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutAFND"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="invisible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="AFND"
+                android:layout_marginBottom="10dp"/>
+
+            <TableLayout
+                android:id="@+id/tableAFND"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4sp"
+                android:layout_marginLeft="4sp"
+                android:layout_marginEnd="4sp"
+                android:layout_marginRight="4sp"
+                android:stretchColumns="*">
+            </TableLayout>
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/layoutAFD"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:visibility="invisible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="AFD"
+                android:layout_marginBottom="10dp"/>
+
+            <TableLayout
+                android:id="@+id/tableAFD"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginStart="4sp"
+                android:layout_marginLeft="4sp"
+                android:layout_marginEnd="4sp"
+                android:layout_marginRight="4sp"
+                android:stretchColumns="*">
+            </TableLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="300dp"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Convertir"
+                android:layout_marginEnd="5dp"/>
+
+            <Button
+                android:id="@+id/btnNuevo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Nuevo"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
