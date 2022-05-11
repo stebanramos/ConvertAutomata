@@ -1,5 +1,6 @@
 package com.stebanramos.convertautomata;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Typeface;
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 layoutAFD.setVisibility(View.VISIBLE);
-                showTabAFD();
+                validateAutomata();
             }
         });
 
@@ -147,105 +148,33 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void getDataAFND() {
-        afndMap = new HashMap<>();
-        sEntradas = new String[nEntradas];
+    private void validateAutomata() {
+        getDataAFND();
+        convertToAFD();
 
-        View row = tLayoutAFND.getChildAt(0);
-        if (row instanceof TableRow) {
-            TableRow rowC = (TableRow) row;
-
-            for (int j = 1; j < rowC.getChildCount(); j++) {
-                TextView texto = (TextView) rowC.getChildAt(j);
-                String edttext = texto.getText().toString();
-                Log.i("Entrada:", edttext);
-
-                sEntradas[j - 1] = edttext;
-            }
+        if (isAFND()) {
+            showTabAFD();
+        } else {
+            showDialog();
         }
-
-
-        for (int i = 1; i < tLayoutAFND.getChildCount(); i++) {
-            row = tLayoutAFND.getChildAt(i);
-            if (row instanceof TableRow) {
-                TableRow rowC = (TableRow) row;
-                Log.i("Estado:", estados[i - 1]);
-                Map<Integer, String> entries = new HashMap<>();
-
-                for (int j = 1; j < rowC.getChildCount(); j++) {
-                    TextView texto = (TextView) rowC.getChildAt(j);
-                    String edttext = texto.getText().toString();
-                    Log.i("Informacion:", edttext);
-
-                    entries.put(j, edttext);
-
-                    afndMap.put(estados[i - 1], entries);
-
-                }
-            }
-        }
-
-        Log.i("Map:", String.valueOf(afndMap));
-
     }
 
-    private void convertToAFD() {
-        Log.i("d_funciones", "convertToAFD()");
+    private boolean isAFND() {
+        boolean isFND = false;
 
+        for (int i = 0; i < estadosAFD.size(); i++) {
 
-        estadosAFD = new ArrayList<>();
-        estadosAFD.add(estados[0]);
-
-        Map<Integer, String> entries;
-        boolean isEmpty = false;
-        for (int j = 0; j < estadosAFD.size(); j++) {
-
-            String estado = estadosAFD.get(j);
-            Log.i("Estado:", estado);
-
-            for (int i = 0; i < nEntradas; i++) {
-
-                String entrada = "";
-
-                if (estadosAFD.get(j).length() >= 2) {
-                    for (int y = 0; y < estadosAFD.get(j).length(); y++) {
-                        char c = estadosAFD.get(j).charAt(y);
-
-                        String e = "";
-                        for (int x = 0; x < nEntradas; x++) {
-                            entries = afndMap.get(String.valueOf(c));
-                            e = entries.get(x + 1);
-                        }
-                        entrada += e;
-
-                    }
-                } else {
-                    entries = afndMap.get(estado);
-                    entrada = entries.get(i + 1);
-                    isEmpty = true;
-                }
-
-                if (!entrada.equals("")) {
-                    boolean isEstado = estadosAFD.contains(entrada);
-                    if (!isEstado) {
-                        estadosAFD.add(entrada);
-                    }
-                }
-
+            if (estadosAFD.get(i).length() != 1) {
+                isFND = true;
             }
-        }
-        if (isEmpty) {
-            estadosAFD.add("");
-        }
-        Log.i("estadosAFD :", estadosAFD.toString());
 
+        }
+
+        return isFND;
     }
 
     private void showTabAFD() {
         tLayoutAFD.removeAllViews();
-
-        getDataAFND();
-        convertToAFD();
 
         tRowFD = new TableRow(this);
         tRowFD.setLayoutParams(lp);
@@ -333,6 +262,116 @@ public class MainActivity extends AppCompatActivity {
             tLayoutAFD.addView(filaEstado);
 
         }
+    }
+
+    private void getDataAFND() {
+        afndMap = new HashMap<>();
+        sEntradas = new String[nEntradas];
+
+        View row = tLayoutAFND.getChildAt(0);
+        if (row instanceof TableRow) {
+            TableRow rowC = (TableRow) row;
+
+            for (int j = 1; j < rowC.getChildCount(); j++) {
+                TextView texto = (TextView) rowC.getChildAt(j);
+                String edttext = texto.getText().toString();
+                Log.i("Entrada:", edttext);
+
+                sEntradas[j - 1] = edttext;
+            }
+        }
+
+        for (int i = 1; i < tLayoutAFND.getChildCount(); i++) {
+            row = tLayoutAFND.getChildAt(i);
+            if (row instanceof TableRow) {
+                TableRow rowC = (TableRow) row;
+                Log.i("Estado:", estados[i - 1]);
+                Map<Integer, String> entries = new HashMap<>();
+
+                for (int j = 1; j < rowC.getChildCount(); j++) {
+                    TextView texto = (TextView) rowC.getChildAt(j);
+                    String edttext = texto.getText().toString();
+                    Log.i("Informacion:", edttext);
+
+                    entries.put(j, edttext);
+
+                    afndMap.put(estados[i - 1], entries);
+
+                }
+            }
+        }
+
+        Log.i("Map:", String.valueOf(afndMap));
+
+    }
+
+    private void convertToAFD() {
+        Log.i("d_funciones", "convertToAFD()");
+
+
+        estadosAFD = new ArrayList<>();
+        estadosAFD.add(estados[0]);
+
+        Map<Integer, String> entries;
+        boolean isEmpty = false;
+        for (int j = 0; j < estadosAFD.size(); j++) {
+
+            String estado = estadosAFD.get(j);
+            Log.i("Estado:", estado);
+
+            for (int i = 0; i < nEntradas; i++) {
+
+                String entrada = "";
+
+                if (estadosAFD.get(j).length() >= 2) {
+                    for (int y = 0; y < estadosAFD.get(j).length(); y++) {
+                        char c = estadosAFD.get(j).charAt(y);
+
+                        String e = "";
+                        for (int x = 0; x < nEntradas; x++) {
+                            entries = afndMap.get(String.valueOf(c));
+                            e = entries.get(x + 1);
+                        }
+                        entrada += e;
+
+                    }
+                } else {
+                    entries = afndMap.get(estado);
+                    entrada = entries.get(i + 1);
+
+                }
+
+                if (!entrada.equals("")) {
+                    boolean isEstado = estadosAFD.contains(entrada);
+                    if (!isEstado) {
+                        estadosAFD.add(entrada);
+                    }
+                }else{
+                    isEmpty = true;
+                }
+
+            }
+        }
+        if (isEmpty) {
+            estadosAFD.add("");
+        }
+        Log.i("estadosAFD :", estadosAFD.toString());
+
+    }
+
+    private void showDialog() {
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("El automata no es FND.  \nPor favor ingrese uno valido")
+                .setTitle("Validate Automata")
+                .setPositiveButton("Aceptar", (dialog, which) -> {
+                    dialog.dismiss();
+                });
+
+
+        AlertDialog dialog = builder.create();
+        dialog.setCancelable(false);
+        dialog.show();
     }
 
 }
