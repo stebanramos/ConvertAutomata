@@ -23,7 +23,7 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
 
     private TableLayout tLayoutAFND, tLayoutAFD;
-    private String[] estados = {"A", "B", "C", "D", "F", "G", "h", "I", "J", "K"};
+    private String[] estados = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
     private List<String> estadosAFD;
     private Map<String, Map<Integer, String>> afndMap;
 
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 layoutAFD.setVisibility(View.VISIBLE);
-                convert();
+                showTabAFD();
             }
         });
 
@@ -148,8 +148,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getDataAFND() {
-        estadosAFD = new ArrayList<>();
-        estadosAFD.add(estados[0]);
         afndMap = new HashMap<>();
         sEntradas = new String[nEntradas];
 
@@ -183,24 +181,71 @@ public class MainActivity extends AppCompatActivity {
 
                     afndMap.put(estados[i - 1], entries);
 
-                    boolean isEstado = estadosAFD.contains(edttext);
-                    if (!isEstado) {
-                        estadosAFD.add(edttext);
-                    }
                 }
             }
         }
-        Log.i("estadosAFD:", estadosAFD.toString());
-        Log.i("Numero estadosAFD:", String.valueOf(estadosAFD.size()));
 
         Log.i("Map:", String.valueOf(afndMap));
 
     }
 
-    private void convert() {
+    private void convertToAFD() {
+        Log.i("d_funciones", "convertToAFD()");
+
+
+        estadosAFD = new ArrayList<>();
+        estadosAFD.add(estados[0]);
+
+        Map<Integer, String> entries;
+        boolean isEmpty = false;
+        for (int j = 0; j < estadosAFD.size(); j++) {
+
+            String estado = estadosAFD.get(j);
+            Log.i("Estado:", estado);
+
+            for (int i = 0; i < nEntradas; i++) {
+
+                String entrada = "";
+
+                if (estadosAFD.get(j).length() >= 2) {
+                    for (int y = 0; y < estadosAFD.get(j).length(); y++) {
+                        char c = estadosAFD.get(j).charAt(y);
+
+                        String e = "";
+                        for (int x = 0; x < nEntradas; x++) {
+                            entries = afndMap.get(String.valueOf(c));
+                            e = entries.get(x + 1);
+                        }
+                        entrada += e;
+
+                    }
+                } else {
+                    entries = afndMap.get(estado);
+                    entrada = entries.get(i + 1);
+                    isEmpty = true;
+                }
+
+                if (!entrada.equals("")) {
+                    boolean isEstado = estadosAFD.contains(entrada);
+                    if (!isEstado) {
+                        estadosAFD.add(entrada);
+                    }
+                }
+
+            }
+        }
+        if (isEmpty) {
+            estadosAFD.add("");
+        }
+        Log.i("estadosAFD :", estadosAFD.toString());
+
+    }
+
+    private void showTabAFD() {
         tLayoutAFD.removeAllViews();
 
         getDataAFND();
+        convertToAFD();
 
         tRowFD = new TableRow(this);
         tRowFD.setLayoutParams(lp);
@@ -235,7 +280,7 @@ public class MainActivity extends AppCompatActivity {
 
             String estadoAFD = estadosAFD.get(x);
 
-            if(estadoAFD.equals("")){
+            if (estadoAFD.equals("")) {
                 estadoAFD = "Error";
             }
 
@@ -262,15 +307,15 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 } else {
-                    if (estado.equals("")){
+                    if (estado.equals("")) {
                         entrada = "Error";
-                    }else{
+                    } else {
 
                         entries = afndMap.get(estado);
                         Log.i("Map entries :", String.valueOf(entries));
                         entrada = entries.get(y + 1);
 
-                        if (entrada.equals("")){
+                        if (entrada.equals("")) {
                             entrada = "Error";
                         }
                     }
