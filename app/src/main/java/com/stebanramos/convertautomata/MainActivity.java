@@ -17,11 +17,14 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
+
+    private final String TAG = "MainActivity";
 
     private TableLayout tLayoutAFND, tLayoutAFD;
     private String[] estados = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
@@ -224,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
                 String estado = estadosAFD.get(x);
                 Log.i("Estado :", estado);
 
-                String entrada = "";
+                StringBuilder entrada = new StringBuilder();
                 Map<Integer, String> entries;
                 if (estado.length() >= 2) {
                     for (int j = 0; j < estado.length(); j++) {
@@ -232,27 +235,39 @@ public class MainActivity extends AppCompatActivity {
                         entries = afndMap.get(String.valueOf(c));
                         Log.i("Map entries :", String.valueOf(entries));
 
-                        entrada += entries.get(y + 1);
+                        String s = entries.get(y + 1);
+
+                        for (int k = 0; k < s.length(); k++) {
+
+                            if(entrada.toString().indexOf(s.charAt(k)) == -1){
+                                entrada.append(s.charAt(k));
+                            }
+                        }
+
 
                     }
                 } else {
                     if (estado.equals("")) {
-                        entrada = "Error";
+                        entrada = new StringBuilder("Error");
                     } else {
 
                         entries = afndMap.get(estado);
                         Log.i("Map entries :", String.valueOf(entries));
-                        entrada = entries.get(y + 1);
+                        entrada = new StringBuilder(entries.get(y + 1));
 
-                        if (entrada.equals("")) {
-                            entrada = "Error";
+                        if (entrada.toString().equals("")) {
+                            entrada = new StringBuilder("Error");
                         }
                     }
 
                 }
 
+                char[] StringtoChar = entrada.toString().toCharArray();
+                Arrays.sort(StringtoChar);
+                String SortedString = new String(StringtoChar);
+
                 TextView textViewEntradas = new TextView(this);
-                textViewEntradas.setText(entrada);
+                textViewEntradas.setText(SortedString);
                 textViewEntradas.setTypeface(null, Typeface.BOLD);
                 textViewEntradas.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 filaEstado.addView(textViewEntradas);
@@ -306,8 +321,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void convertToAFD() {
-        Log.i("d_funciones", "convertToAFD()");
-
+        Log.i(TAG, "convertToAFD()");
 
         estadosAFD = new ArrayList<>();
         estadosAFD.add(estados[0]);
@@ -317,36 +331,48 @@ public class MainActivity extends AppCompatActivity {
         for (int j = 0; j < estadosAFD.size(); j++) {
 
             String estado = estadosAFD.get(j);
-            Log.i("Estado:", estado);
+            Log.i(TAG, "convertToAFD() Estado " + estado);
 
             for (int i = 0; i < nEntradas; i++) {
 
-                String entrada = "";
+                StringBuilder entrada = new StringBuilder();
 
                 if (estadosAFD.get(j).length() >= 2) {
                     for (int y = 0; y < estadosAFD.get(j).length(); y++) {
                         char c = estadosAFD.get(j).charAt(y);
 
-                        String e = "";
-                        for (int x = 0; x < nEntradas; x++) {
-                            entries = afndMap.get(String.valueOf(c));
-                            e = entries.get(x + 1);
-                        }
-                        entrada += e;
+                        entries = afndMap.get(String.valueOf(c));
 
+                        String s = entries.get(i + 1);
+
+                        Log.i(TAG, "convertToAFD() Entrada s = " + s);
+
+                        for (int k = 0; k < s.length(); k++) {
+
+                            if(entrada.toString().indexOf(s.charAt(k)) != -1){
+
+                            }else{
+                                entrada.append(s.charAt(k));
+                            }
+                        }
                     }
                 } else {
                     entries = afndMap.get(estado);
-                    entrada = entries.get(i + 1);
+                    entrada = new StringBuilder(entries.get(i + 1));
 
                 }
+                Log.i(TAG, "convertToAFD() Entrada " + entrada);
 
-                if (!entrada.equals("")) {
-                    boolean isEstado = estadosAFD.contains(entrada);
+                char[] StringtoChar = entrada.toString().toCharArray();
+                Arrays.sort(StringtoChar);
+                String SortedString = new String(StringtoChar);
+
+                if (!SortedString.equals("")) {
+                    boolean isEstado = estadosAFD.contains(SortedString);
                     if (!isEstado) {
-                        estadosAFD.add(entrada);
+                        estadosAFD.add(SortedString);
                     }
-                }else{
+                } else {
                     isEmpty = true;
                 }
 
@@ -355,7 +381,8 @@ public class MainActivity extends AppCompatActivity {
         if (isEmpty) {
             estadosAFD.add("");
         }
-        Log.i("estadosAFD :", estadosAFD.toString());
+        Log.i(TAG, "convertToAFD() estadosAFD " + estadosAFD.toString());
+
 
     }
 
