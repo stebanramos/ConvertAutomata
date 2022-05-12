@@ -3,13 +3,16 @@ package com.stebanramos.convertautomata;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.text.method.DigitsKeyListener;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -95,8 +98,15 @@ public class MainActivity extends AppCompatActivity {
         btnConvert.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                view.clearFocus();
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
                 layoutAFD.setVisibility(View.VISIBLE);
                 validateAutomata();
+
+
             }
         });
 
@@ -155,6 +165,7 @@ public class MainActivity extends AppCompatActivity {
                     editText.setFilters(new InputFilter[]{new InputFilterMinMax("0", "1")});
                 } else {
                     editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+                    editText.setFilters(new InputFilter[] {new InputFilterCharacters()});
                 }
 
                 editText.setWidth(10);
