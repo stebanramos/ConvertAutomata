@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
@@ -30,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private String[] estados = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
     private List<String> estadosAFD;
     private Map<String, Map<Integer, String>> afndMap;
+    private List<String> eAceptacion;
 
     //Con ese atributo decimos que la anchura de la fila será con el atributo WRAP_CONTENT
     private TableRow.LayoutParams lp;
@@ -117,11 +119,19 @@ public class MainActivity extends AppCompatActivity {
         for (int x = 0; x < nEntradas; x++) {
             EditText editText = new EditText(this);
             editText.setInputType(InputType.TYPE_CLASS_NUMBER);
-            editText.setHint("Entrada " + (x + 1));
+            editText.setHint("E " + (x + 1));
             editText.setWidth(10);
             editText.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             tRowFND.addView(editText);
         }
+
+        //El elemento de la derecha (estados de aceptacion)
+        tv = new TextView(this);
+        tv.setTypeface(null, Typeface.BOLD);
+        tv.setText("A(1)/R(0)");
+        tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        tRowFND.addView(tv);
+
         // Finalmente agregar la fila en la primera posición
         tLayoutAFND.addView(tRowFND, 0);
         // Ahora por cada color hacer casi lo mismo
@@ -137,9 +147,16 @@ public class MainActivity extends AppCompatActivity {
             textViewestado.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             filaEstado.addView(textViewestado);
             // Y ahora por cada estado, agregar un campo de texto
-            for (int y = 0; y < nEntradas; y++) {
+            for (int y = 0; y < nEntradas + 1; y++) {
                 EditText editText = new EditText(this);
-                editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+
+                if (y == nEntradas) {
+                    editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    editText.setFilters(new InputFilter[]{new InputFilterMinMax("0", "1")});
+                } else {
+                    editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS | InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS);
+                }
+
                 editText.setWidth(10);
                 editText.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 filaEstado.addView(editText);
@@ -199,6 +216,14 @@ public class MainActivity extends AppCompatActivity {
             textViewEntradas.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             tRowFD.addView(textViewEntradas);
         }
+
+        //El elemento de la derecha (estados de aceptacion)
+        tv = new TextView(this);
+        tv.setTypeface(null, Typeface.BOLD);
+        tv.setText("A(1)/R(0)");
+        tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+        tRowFD.addView(tv);
+
         // Finalmente agregar la fila en la primera posición
         tLayoutAFD.addView(tRowFD, 0);
         // Ahora por cada color hacer casi lo mismo
@@ -222,52 +247,66 @@ public class MainActivity extends AppCompatActivity {
             filaEstado.addView(textViewestado);
             // Y ahora por cada estado, agregar un campo de texto
 
-            for (int y = 0; y < nEntradas; y++) {
+            for (int y = 0; y < nEntradas + 1; y++) {
 
-                String estado = estadosAFD.get(x);
-                Log.i("Estado :", estado);
+                TextView textViewEntradas = new TextView(this);
 
-                StringBuilder entrada = new StringBuilder();
-                Map<Integer, String> entries;
-                if (estado.length() >= 2) {
-                    for (int j = 0; j < estado.length(); j++) {
-                        char c = estado.charAt(j);
-                        entries = afndMap.get(String.valueOf(c));
-                        Log.i("Map entries :", String.valueOf(entries));
+                if (y == nEntradas) {
+                    String aceptacion = "0";
+                    for (int i = 0; i < eAceptacion.size(); i++) {
+                        if (estadosAFD.get(x).contains(eAceptacion.get(i))) {
+                            aceptacion = "1";
+                        }
+                    }
+                    textViewEntradas.setText(aceptacion);
+                } else {
+                    String estado = estadosAFD.get(x);
+                    Log.i("Estado :", estado);
 
-                        String s = entries.get(y + 1);
+                    StringBuilder entrada = new StringBuilder();
+                    Map<Integer, String> entries;
+                    if (estado.length() >= 2) {
+                        for (int j = 0; j < estado.length(); j++) {
+                            char c = estado.charAt(j);
+                            entries = afndMap.get(String.valueOf(c));
+                            Log.i("Map entries :", String.valueOf(entries));
 
-                        for (int k = 0; k < s.length(); k++) {
+                            String s = entries.get(y + 1);
 
-                            if(entrada.toString().indexOf(s.charAt(k)) == -1){
-                                entrada.append(s.charAt(k));
+                            for (int k = 0; k < s.length(); k++) {
+
+                                if (entrada.toString().indexOf(s.charAt(k)) == -1) {
+                                    entrada.append(s.charAt(k));
+                                }
+                            }
+
+                        }
+                    } else {
+                        if (estado.equals("")) {
+                            entrada = new StringBuilder("Error");
+                        } else {
+
+                            entries = afndMap.get(estado);
+                            Log.i("Map entries :", String.valueOf(entries));
+                            entrada = new StringBuilder(entries.get(y + 1));
+
+                            if (entrada.toString().equals("")) {
+                                entrada = new StringBuilder("Error");
                             }
                         }
-
-
                     }
-                } else {
-                    if (estado.equals("")) {
-                        entrada = new StringBuilder("Error");
-                    } else {
 
-                        entries = afndMap.get(estado);
-                        Log.i("Map entries :", String.valueOf(entries));
-                        entrada = new StringBuilder(entries.get(y + 1));
-
-                        if (entrada.toString().equals("")) {
-                            entrada = new StringBuilder("Error");
-                        }
+                    if (entrada.toString().equals("Error")) {
+                        textViewEntradas.setText(entrada.toString());
+                    }else{
+                        char[] StringtoChar = entrada.toString().toCharArray();
+                        Arrays.sort(StringtoChar);
+                        String SortedString = new String(StringtoChar);
+                        textViewEntradas.setText(SortedString);
                     }
 
                 }
 
-                char[] StringtoChar = entrada.toString().toCharArray();
-                Arrays.sort(StringtoChar);
-                String SortedString = new String(StringtoChar);
-
-                TextView textViewEntradas = new TextView(this);
-                textViewEntradas.setText(SortedString);
                 textViewEntradas.setTypeface(null, Typeface.BOLD);
                 textViewEntradas.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 filaEstado.addView(textViewEntradas);
@@ -282,12 +321,13 @@ public class MainActivity extends AppCompatActivity {
     private void getDataAFND() {
         afndMap = new HashMap<>();
         sEntradas = new String[nEntradas];
+        eAceptacion = new ArrayList<>();
 
         View row = tLayoutAFND.getChildAt(0);
         if (row instanceof TableRow) {
             TableRow rowC = (TableRow) row;
 
-            for (int j = 1; j < rowC.getChildCount(); j++) {
+            for (int j = 1; j < rowC.getChildCount() - 1; j++) {
                 TextView texto = (TextView) rowC.getChildAt(j);
                 String edttext = texto.getText().toString();
                 Log.i("Entrada:", edttext);
@@ -303,16 +343,24 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("Estado:", estados[i - 1]);
                 Map<Integer, String> entries = new HashMap<>();
 
-                for (int j = 1; j < rowC.getChildCount(); j++) {
+                int nColumns = rowC.getChildCount();
+
+                for (int j = 1; j < nColumns; j++) {
                     TextView texto = (TextView) rowC.getChildAt(j);
                     String edttext = texto.getText().toString();
                     Log.i("Informacion:", edttext);
 
-                    entries.put(j, edttext);
+                    if (edttext.equals("1")) {
 
-                    afndMap.put(estados[i - 1], entries);
+                        eAceptacion.add(estados[i - 1]);
+
+                    } else {
+                        entries.put(j, edttext);
+                        afndMap.put(estados[i - 1], entries);
+                    }
 
                 }
+
             }
         }
 
@@ -349,9 +397,9 @@ public class MainActivity extends AppCompatActivity {
 
                         for (int k = 0; k < s.length(); k++) {
 
-                            if(entrada.toString().indexOf(s.charAt(k)) != -1){
+                            if (entrada.toString().indexOf(s.charAt(k)) != -1) {
 
-                            }else{
+                            } else {
                                 entrada.append(s.charAt(k));
                             }
                         }
