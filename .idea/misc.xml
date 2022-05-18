@@ -4,7 +4,9 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Proyectos/Android/ConvertAutomata/app/src/main/res/drawable/border_table.xml" value="0.338" />
+        <entry key="..\:/Proyectos/Android/ConvertAutomata/app/src/main/res/layout/activity_grafo.xml" value="0.18958333333333333" />
         <entry key="..\:/Proyectos/Android/ConvertAutomata/app/src/main/res/layout/activity_main.xml" value="0.296195652173913" />
+        <entry key="..\:/Proyectos/Android/ConvertAutomata/app/src/main/res/layout/activity_view_graf.xml" value="0.33177083333333335" />
       </map>
     </option>
   </component>

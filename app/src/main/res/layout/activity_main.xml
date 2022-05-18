@@ -125,6 +125,14 @@
                 android:text="Nuevo"
                 android:visibility="gone"/>
 
+            <Button
+                android:id="@+id/btnGrafo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Graficar"
+                android:visibility="gone"/>
+
         </LinearLayout>
 
 

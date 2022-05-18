@@ -4,6 +4,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Canvas;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -20,6 +22,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private String[] estados = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
     private List<String> estadosAFD;
     private Map<String, Map<Integer, String>> afndMap;
+    private Map<String, Map<Integer, String>> afdMap;
     private List<String> eAceptacion;
 
     //Con ese atributo decimos que la anchura de la fila será con el atributo WRAP_CONTENT
@@ -61,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         Button btnConvert = findViewById(R.id.btnConvert);
         Button btnNuevo = findViewById(R.id.btnNuevo);
         Button btnContinuar = findViewById(R.id.btncontinuar);
+        Button btnGrafico = findViewById(R.id.btnGrafo);
 
         lp = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT);
 
@@ -89,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
                 layoutAFD.setVisibility(View.GONE);
                 btnConvert.setVisibility(View.GONE);
                 btnNuevo.setVisibility(View.GONE);
+                btnGrafico.setVisibility(View.GONE);
 
                 tLayoutAFD.removeAllViews();
                 tLayoutAFND.removeAllViews();
@@ -105,7 +111,22 @@ public class MainActivity extends AppCompatActivity {
 
                 layoutAFD.setVisibility(View.VISIBLE);
                 validateAutomata();
+                btnGrafico.setVisibility(View.VISIBLE);
 
+            }
+        });
+
+        btnGrafico.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(MainActivity.this, GrafoActivity.class);
+                intent.putStringArrayListExtra("estadosAFD", (ArrayList<String>) estadosAFD);
+                intent.putStringArrayListExtra("eAceptacion", (ArrayList<String>) eAceptacion);
+                intent.putExtra("afndMap", (Serializable) afndMap);
+                intent.putExtra("afdMap", (Serializable) afdMap);
+                intent.putExtra("nEntradas", nEntradas);
+                startActivity(intent);
 
             }
         });
@@ -235,6 +256,8 @@ public class MainActivity extends AppCompatActivity {
         tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         tRowFD.addView(tv);
 
+        afdMap = new HashMap<>();
+
         // Finalmente agregar la fila en la primera posición
         tLayoutAFD.addView(tRowFD, 0);
         // Ahora por cada color hacer casi lo mismo
@@ -258,6 +281,7 @@ public class MainActivity extends AppCompatActivity {
             filaEstado.addView(textViewestado);
             // Y ahora por cada estado, agregar un campo de texto
 
+            Map<Integer, String> estadoTo = new HashMap<>();
             for (int y = 0; y < nEntradas + 1; y++) {
 
                 TextView textViewEntradas = new TextView(this);
@@ -272,7 +296,7 @@ public class MainActivity extends AppCompatActivity {
                     textViewEntradas.setText(aceptacion);
                 } else {
                     String estado = estadosAFD.get(x);
-                    Log.i("Estado :", estado);
+                    Log.i("    Estado :", estado);
 
                     StringBuilder entrada = new StringBuilder();
                     Map<Integer, String> entries;
@@ -309,11 +333,14 @@ public class MainActivity extends AppCompatActivity {
 
                     if (entrada.toString().equals("Error")) {
                         textViewEntradas.setText(entrada.toString());
+                        estadoTo.put(y, entrada.toString());
+
                     }else{
                         char[] StringtoChar = entrada.toString().toCharArray();
                         Arrays.sort(StringtoChar);
                         String SortedString = new String(StringtoChar);
                         textViewEntradas.setText(SortedString);
+                        estadoTo.put(y, SortedString);
                     }
 
                 }
@@ -322,9 +349,14 @@ public class MainActivity extends AppCompatActivity {
                 textViewEntradas.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 filaEstado.addView(textViewEntradas);
                 filaEstado.setMinimumWidth(10);
+
+
             }
             // Finalmente agregar la fila
             tLayoutAFD.addView(filaEstado);
+            Log.i("d_funciones", "estadoTo " + estadoTo);
+
+            afdMap.put(estadoAFD, estadoTo);
 
         }
     }
@@ -459,5 +491,6 @@ public class MainActivity extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.show();
     }
+
 
 }
