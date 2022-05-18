@@ -63,7 +63,7 @@ public class GrafoActivity extends AppCompatActivity {
 
                 for (int j = 0; j < eAceptacion.size(); j++) {
 
-                    if (estados.get(i).equals(eAceptacion.get(j))){
+                    if (estados.get(i).contains(eAceptacion.get(j))){
                         paint.setColor(Color.GREEN);
                     }else{
                         paint.setColor(Color.GRAY);
