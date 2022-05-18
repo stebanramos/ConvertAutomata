@@ -122,7 +122,14 @@ public class GrafoActivity extends AppCompatActivity {
                             xEnd = Integer.parseInt(coorEnd[0]);
                             yEnd = Integer.parseInt(coorEnd[1]);
                             Log.i("d_funciones", "coorEnd " + xEnd + "," + yEnd);
-                            canvas.drawLine(xStart + 10, yStart + 10, xEnd - 10, yEnd - 10, text);
+
+                            if (!estatoTo.equals(estado)) {
+                                text.setColor(Color.BLACK);
+                                canvas.drawLine(xStart + 20, yStart + 20, xEnd - 20, yEnd - 20, text);
+                                text.setColor(Color.RED);
+                                canvas.drawPoint(xEnd - 20, yEnd - 20, text);
+                            }
+
                         }
                     }
 
